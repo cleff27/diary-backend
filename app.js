@@ -10,7 +10,7 @@ const cors = require("cors");
 const app = express();
 app.use(
   cors({
-    origin: ["http://localhost:3000"],
+    origin: ["https://diary-anvu.onrender.com", "http://localhost:3000"],
     credentials: true,
   })
 );
