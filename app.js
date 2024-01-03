@@ -33,6 +33,8 @@ const userSchema = new mongoose.Schema({
   friends: [String],
   friendRequests: [String],
   blogs: [String],
+  comments: [String],
+  isAdmin: { type: Number, default: 0 },
 });
 const blogSchema = new mongoose.Schema({
   title: String,
@@ -239,6 +241,34 @@ app.post("/accept-request/:userId", (req, res) => {
     .catch((error) => res.status(500).json({ error: "Internal Server Error" }));
 });
 
+app.post("/searchuser", (req, res) => {
+  const { query } = req.body;
+
+  // Use a regular expression for a case-insensitive search
+  console.log(req.body);
+  const regex = new RegExp(`^${query}$`, "i");
+  User.find({
+    $or: [
+      { fname: regex },
+      { email: regex },
+      {
+        $expr: {
+          $regexMatch: {
+            input: { $concat: ["$fname", " ", "$lname"] },
+            regex: regex,
+          },
+        },
+      },
+    ],
+  })
+    .then((users) => {
+      res.json(users);
+    })
+    .catch((error) => {
+      console.error("Error searching users:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    });
+});
 app.get("/allusers", (req, res) => {
   User.find({})
     .then((users) => res.status(200).json(users))
