@@ -86,6 +86,37 @@ app.post("/create", (request, response) => {
     });
 });
 
+app.put("/update/:id", (req, res) => {
+  const { id } = req.params;
+  const updatedBlogData = req.body;
+
+  Blog.findByIdAndUpdate(id, { $set: updatedBlogData }, { new: true })
+    .then((updatedBlog) => {
+      if (updatedBlog) {
+        res.json({ success: true, message: "Blog updated successfully." });
+      } else {
+        res.status(404).json({ success: false, message: "Blog not found." });
+      }
+    })
+    .catch((error) =>
+      res.status(500).json({ success: false, message: "Internal Server Error" })
+    );
+});
+
+app.delete("/delete/:id", function (req, res) {
+  Blog.findByIdAndDelete(req.params.id)
+    .then((deletedBlog) => {
+      if (deletedBlog) {
+        res.json({ success: true, message: "Blog deleted successfully." });
+      } else {
+        res.status(404).json({ success: false, message: "Blog not found." });
+      }
+    })
+    .catch((error) =>
+      res.status(500).json({ success: false, message: "Internal Server Error" })
+    );
+});
+
 app.get("/blog/:id", (req, res) => {
   let id = req.params.id;
   Blog.findOne({ _id: id })
